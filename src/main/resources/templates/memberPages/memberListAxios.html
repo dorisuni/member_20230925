@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>id</th>
+        <th>계정</th>
+        <th>비밀번호</th>
+        <th>이름</th>
+        <th>생년월일</th>
+        <th>전화번호</th>
+        <th>조회</th>
+        <th>수정</th>
+    </tr>
+    <tr th:each="member: ${memberList}">
+        <td>
+            <a th:href="@{|/member/${member.id}|}" th:text="${member.id}"></a>
+        </td>
+        <td th:text="${member.memberEmail}"></td>
+        <td th:text="${member.memberPassword}"></td>
+        <td th:text="${member.memberName}"></td>
+        <td th:text="${member.memberBirth}"></td>
+        <td th:text="${member.memberMobile}"></td>
+        <td>
+            <button th:onclick="detail([[${member.id}]])">조회</button>
+            <button th:onclick="detail([[${member.id}]])">axios 조회</button>
+        </td>
+        <td>
+            <button th:onclick="update_fn([[${member.id}]])">수정</button>
+            <button th:onclick="update_fn([[${member.id}]])">axios 수정</button>
+        </td>
+        <td>
+            <button th:onclick="delete_fn([[${member.id}]])">삭제</button>
+            <button th:onclick="deleteId([[${member.id}]])">axios 삭제</button>
+        </td>
+    </tr>
+</table>
+</body>
+<script th:inline="javascript">
+    const detail = (id) => {
+        location.href = `/member/${id}`;
+        // location.href = "/member/" + id;
+    }
+    const update_fn = (id) => {
+        location.href = `/member/update/${id}`;
+    }
+    const delete_fn = (id) => {
+        location.href = `/member/delete/${id}`;
+    }
+
+    const deleteId=(id)=>{
+        axios({
+            url: `/member/delete/${id}`, // 통신할 웹문서
+            method: 'post', // 통신할 방식
+            data: { // 인자로 보낼 데이터
+                id: id
+            }
+        });
+    }
+
+
+</script>
+</html>

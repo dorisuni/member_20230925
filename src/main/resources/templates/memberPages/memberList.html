@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="member-list-area">
+<table>
+    <tr>
+        <th>id</th>
+        <th>계정</th>
+        <th>비밀번호</th>
+        <th>이름</th>
+        <th>생년월일</th>
+        <th>전화번호</th>
+        <th>조회</th>
+        <th>수정</th>
+    </tr>
+    <tr th:each="member: ${memberList}">
+        <td>
+            <a th:href="@{|/member/${member.id}|}" th:text="${member.id}"></a>
+        </td>
+        <td th:text="${member.memberEmail}"></td>
+        <td th:text="${member.memberPassword}"></td>
+        <td th:text="${member.memberName}"></td>
+        <td th:text="${member.memberBirth}"></td>
+        <td th:text="${member.memberMobile}"></td>
+        <td>
+            <button th:onclick="detail([[${member.id}]])">조회</button>
+            <button th:onclick="detail([[${member.id}]])">axios 조회</button>
+        </td>
+        <td>
+            <button th:onclick="update_fn([[${member.id}]])">수정</button>
+            <button th:onclick="update_fn([[${member.id}]])">axios 수정</button>
+        </td>
+        <td>
+            <button th:onclick="delete_fn([[${member.id}]])">삭제</button>
+            <button th:onclick="deleteId([[${member.id}]])">axios 삭제</button>
+        </td>
+    </tr>
+</table>
+</div>
+</body>
+<script th:inline="javascript">
+    const detail = (id) => {
+        location.href = `/member/${id}`;
+        // location.href = "/member/" + id;
+    }
+    const update_fn = (id) => {
+        location.href = `/member/update/${id}`;
+    }
+    const delete_fn = (id) => {
+        location.href = `/member/delete/${id}`;
+    }
+
+    const deleteId=(id)=>{
+        console.log("현재입력된id값:",id)
+        const result = document.getElementById("member-list-area");
+        const config = {
+            method: 'post', // HTTP 메서드 설정 (get, post, put, delete 등)
+            url: '/member/delete/', // 요청을 보낼 URL
+            params: { // 쿼리 매개변수 설정
+                id: id,
+            }
+        };
+        // 엑시오스 요청 보내기
+        axios(config)
+            .then(response => {
+                // 요청이 성공한 경우, 응답 데이터 출력
+                console.log('응답 데이터:', response.data);
+                let output = "<table>\n" +
+                    "    <tr>\n" +
+                    "        <th>id</th>\n" +
+                    "        <th>계정</th>\n" +
+                    "        <th>비밀번호</th>\n" +
+                    "        <th>이름</th>\n" +
+                    "        <th>생년월일</th>\n" +
+                    "        <th>전화번호</th>\n" +
+                    "        <th>조회</th>\n" +
+                    "        <th>수정</th>\n" +
+                    "    </tr>\n";
+                // 데이터 루프를 통해 행 추가
+                for (const key in response.data) {
+                    const member = response.data[key];
+                    output += "    <tr>\n";
+                    output += `        <td><a href="/member/${member.id}">${member.id}</a></td>\n`;
+                    output += `        <td>${member.memberEmail}</td>\n`;
+                    output += `        <td>${member.memberPassword}</td>\n`;
+                    output += `        <td>${member.memberName}</td>\n`;
+                    output += `        <td>${member.memberBirth}</td>\n`;
+                    output += "        <td>\n";
+                    output += `            <button onclick="detail(${member.id})">조회</button>\n`;
+                    output += `            <button onclick="detail(${member.id})">axios 조회</button>\n`;
+                    output += "        </td>\n";
+                    output += "        <td>\n";
+                    output += `            <button onclick="update_fn(${member.id})">수정</button>\n`;
+                    output += `            <button onclick="update_fn(${member.id})">axios 수정</button>\n`;
+                    output += "        </td>\n";
+                    output += "        <td>\n";
+                    output += `            <button onclick="delete_fn(${member.id})">삭제</button>\n`;
+                    output += `            <button onclick="deleteId(${member.id})">axios 삭제</button>\n`;
+                    output += "        </td>\n";
+                    output += "    </tr>\n";
+                }
+
+                output += "</table>";
+
+// 결과를 member-list-area에 출력
+                document.getElementById("member-list-area").innerHTML = output;
+            })
+            .catch(error => {
+                // 요청이 실패한 경우, 에러 처리
+                console.error('에러 발생:', error);
+            });
+    }
+
+
+</script>
+</html>
